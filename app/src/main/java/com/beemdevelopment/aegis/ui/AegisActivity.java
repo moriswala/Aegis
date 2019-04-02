@@ -1,5 +1,6 @@
 package com.beemdevelopment.aegis.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.WindowManager;
@@ -16,6 +17,15 @@ public abstract class AegisActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         _app = (AegisApplication) getApplication();
+
+        // if the app was killed, relaunch MainActivity and close everything else
+        if (!(this instanceof MainActivity) && !(this instanceof AuthActivity) && _app.getDatabaseManager().isLocked()) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+            return;
+        }
 
         // set FLAG_SECURE on the window of every AegisActivity
         if (getPreferences().isSecureScreenEnabled()) {
